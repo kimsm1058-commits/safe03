@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>무재해 상황판 — 단일 카드 버전</title>
+  <style>
+    :root{
+      --bg: #F6F9F8;
+      --card: #FFFFFF;
+      --accent: #7EC8C9;
+      --muted: #6B7C7C;
+      --text: #07363A;
+      font-family: 'Noto Sans KR', sans-serif;
+    }
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center}
+    .card{
+      background:var(--card);
+      border-radius:10px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.1);
+      padding:16px 20px;
+      width:320px;
+      box-sizing:border-box;
+    }
+    .title{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .logo{
+      width:48px;
+      height:48px;
+      border-radius:8px;
+      background:var(--accent);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:white;
+      font-weight:700;
+      font-size:16px;
+    }
+    h1{margin:0;font-size:20px;}
+    .date{font-size:13px;color:var(--muted);margin-bottom:12px}
+    .row{
+      display:flex;
+      justify-content:space-between;
+      padding:6px 0;
+      border-bottom:1px solid #eee;
+      font-size:14px;
+    }
+    .row:last-child{border-bottom:none}
+    .label{color:var(--muted)}
+    .value{font-weight:700;color:var(--text)}
+    .big-value{font-size:36px;font-weight:800;color:var(--accent)}
+    .admin{
+      margin-top:12px;
+      display:flex;
+      gap:6px;
+    }
+    input[type="date"], button{
+      padding:4px 6px;
+      font-size:12px;
+      border-radius:4px;
+      border:1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="title">
+      <div class="logo">안전</div>
+      <h1>무재해 상황판</h1>
+    </div>
+    <div class="date" id="todayDisplay">오늘: --</div>
+
+    <div class="row">
+      <div class="label">무재해 연속 일수</div>
+      <div class="big-value" id="daysCount">0</div>
+    </div>
+    <div class="row">
+      <div class="label">마지막 재해 일자</div>
+      <div class="value" id="lastDate">-</div>
+    </div>
+    <div class="row">
+      <div class="label">무재해 목표(일)</div>
+      <div class="value" id="goalDays">1000</div>
+    </div>
+    <div class="row">
+      <div class="label">목표까지 남은 일수</div>
+      <div class="value" id="daysLeft">-</div>
+    </div>
+
+    <div class="admin">
+      <input type="date" id="inputLast" />
+      <button id="applyBtn">적용</button>
+    </div>
+  </div>
+
+  <script>
+    let lastIncidentDate = '2024-04-17';
+    const goalDays = 1000;
+
+    const daysCountEl = document.getElementById('daysCount');
+    const lastDateEl = document.getElementById('lastDate');
+    const goalDaysEl = document.getElementById('goalDays');
+    const daysLeftEl = document.getElementById('daysLeft');
+    const todayDisplay = document.getElementById('todayDisplay');
+    const inputLast = document.getElementById('inputLast');
+    const applyBtn = document.getElementById('applyBtn');
+
+    function formatDateKR(d){ return d.toLocaleDateString('ko-KR'); }
+
+    function compute(){
+      const now = new Date();
+      const last = new Date(lastIncidentDate + 'T00:00:00');
+      const msPerDay = 24*60*60*1000;
+      const diff = Math.floor((now - last)/msPerDay);
+      const days = diff >= 0 ? diff : 0;
+      const left = goalDays - days;
+
+      daysCountEl.textContent = days;
+      lastDateEl.textContent = lastIncidentDate;
+      goalDaysEl.textContent = goalDays;
+      daysLeftEl.textContent = left >= 0 ? left : 0;
+      todayDisplay.textContent = '오늘: ' + formatDateKR(now);
+    }
+
+    applyBtn.addEventListener('click', ()=>{
+      const ld = inputLast.value;
+      if(ld) lastIncidentDate = ld;
+      compute();
+    });
+
+    inputLast.value = lastIncidentDate;
+    compute();
+    setInterval(compute, 1000*60*60);
+  </script>
+</body>
+</html>
